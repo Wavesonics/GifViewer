@@ -8,7 +8,7 @@
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
-    <pl.droidsonroids.gif.GifImageView
+    <com.darkrockstudios.uriimageview.UriImageView
         android:id="@+id/fullscreen_content"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
