@@ -15,6 +15,8 @@ import com.darkrockstudios.apps.gifviewer.R;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -99,53 +101,63 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 		List<String> mimeTypes = null;
 
 		InputStream inputStream = null;
+		final int contentLength;
 		try
 		{
-			URL url = new URL( m_uri.toString() );
-			urlConnection = (HttpURLConnection) url.openConnection();
-
-			publishProgress( 1, 100 );
-			Map<String, List<String>> headers = urlConnection.getHeaderFields();
-			if( headers != null )
+			if( "file".equals( m_uri.getScheme() ) )
 			{
-				mimeTypes = headers.get( CONTENT_TYPE );
+				File file = new File( m_uri.getPath() );
+				FileInputStream fis = new FileInputStream( file );
+				contentLength = (int) fis.getChannel().size();
+				inputStream = fis;
 			}
-			// We must try and guess the Mimetype from the URL if we didn't get headers
 			else
 			{
-				ContentResolver contentResolver = m_context.getContentResolver();
-				MimeTypeMap mime = MimeTypeMap.getSingleton();
+				URL url = new URL( m_uri.toString() );
+				urlConnection = (HttpURLConnection) url.openConnection();
 
-				String type = contentResolver.getType( m_uri );
-				if( type != null )
+				publishProgress( 1, 100 );
+				Map<String, List<String>> headers = urlConnection.getHeaderFields();
+				if( headers != null )
 				{
-					String mimeType = mime.getExtensionFromMimeType( type );
-					if( mimeType != null )
+					mimeTypes = headers.get( CONTENT_TYPE );
+				}
+				// We must try and guess the Mimetype from the URL if we didn't get headers
+				else
+				{
+					ContentResolver contentResolver = m_context.getContentResolver();
+					MimeTypeMap mime = MimeTypeMap.getSingleton();
+
+					String type = contentResolver.getType( m_uri );
+					if( type != null )
 					{
-						mimeTypes = new ArrayList<>();
-						mimeTypes.add( mimeType );
+						String mimeType = mime.getExtensionFromMimeType( type );
+						if( mimeType != null )
+						{
+							mimeTypes = new ArrayList<>();
+							mimeTypes.add( mimeType );
+						}
 					}
 				}
-			}
 
-			final int contentLength;
-			if( headers != null )
-			{
-				List<String> contentLengths = headers.get( CONTENT_LENGTH );
-				if( contentLengths != null && contentLengths.size() > 0 )
+				if( headers != null )
 				{
-					contentLength = Integer.parseInt( contentLengths.get( 0 ) );
+					List<String> contentLengths = headers.get( CONTENT_LENGTH );
+					if( contentLengths != null && contentLengths.size() > 0 )
+					{
+						contentLength = Integer.parseInt( contentLengths.get( 0 ) );
+					}
+					else
+					{
+						contentLength = 0;
+						publishProgress( 0, 0, -1 );
+					}
 				}
 				else
 				{
 					contentLength = 0;
 					publishProgress( 0, 0, -1 );
 				}
-			}
-			else
-			{
-				contentLength = 0;
-				publishProgress( 0, 0, -1 );
 			}
 
 			if( contentLength > 0 )
@@ -156,7 +168,7 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 			{
 				imageStream = new ByteArrayOutputStream();
 			}
-			inputStream = new BufferedInputStream( urlConnection.getInputStream() );
+			inputStream = new BufferedInputStream( inputStream );
 
 			final int BUF_SIZE = 1024;
 			final byte[] buffer = new byte[ BUF_SIZE ];

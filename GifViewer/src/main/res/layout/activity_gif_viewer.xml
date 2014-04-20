@@ -2,6 +2,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+             android:background="@android:color/black"
              tools:context="com.darkrockstudios.apps.gifviewer.GifViewerActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -26,10 +27,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
+            android:background="@color/button_bar_background"
             android:orientation="horizontal"
+            android:gravity="center"
             tools:ignore="UselessParent">
 
+            <ImageButton
+                android:id="@+id/play_button"
+                style="?metaButtonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onPausePlayClicked"
+                android:src="@drawable/btn_media_control_play"/>
         </LinearLayout>
     </FrameLayout>
 

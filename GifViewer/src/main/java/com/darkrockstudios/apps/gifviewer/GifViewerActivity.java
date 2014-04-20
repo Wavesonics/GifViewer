@@ -16,6 +16,7 @@ import com.darkrockstudios.uriimageview.UriImageView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import pl.droidsonroids.gif.GifDrawable;
 
 
 /**
@@ -144,7 +145,7 @@ public class GifViewerActivity extends Activity
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
-		//findViewById( R.id.dummy_button ).setOnTouchListener( mDelayHideTouchListener );
+		findViewById( R.id.play_button ).setOnTouchListener( mDelayHideTouchListener );
 	}
 
 	@Override
@@ -232,5 +233,24 @@ public class GifViewerActivity extends Activity
 	{
 		mHideHandler.removeCallbacks( mHideRunnable );
 		mHideHandler.postDelayed( mHideRunnable, delayMillis );
+	}
+
+	public void onPausePlayClicked( View view )
+	{
+		if( m_imageView != null )
+		{
+			GifDrawable gifDrawable = m_imageView.getGif();
+			if( gifDrawable != null )
+			{
+				if( gifDrawable.isRunning() )
+				{
+					gifDrawable.pause();
+				}
+				else
+				{
+					gifDrawable.start();
+				}
+			}
+		}
 	}
 }

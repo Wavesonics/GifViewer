@@ -18,7 +18,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 /**
  * Created by Adam on 11/22/13.
  */
-public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMatrixChangedListener, PhotoViewAttacher.OnPhotoTapListener
+public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMatrixChangedListener
 {
 	private static final String TAG = UriImageView.class.getSimpleName();
 
@@ -39,16 +39,22 @@ public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMat
 	private ImageZoomListener m_zoomListener;
 	private boolean           m_zooming;
 
-	@Override
-	public void onPhotoTap( final View view, final float v, final float v2 )
+	public GifDrawable getGif()
 	{
-		// Restart animated GIFs
+		final GifDrawable gifDrawable;
+
 		Drawable drawable = m_imageView.getDrawable();
 		if( drawable != null && drawable instanceof GifDrawable )
 		{
-			GifDrawable gifDrawable = (GifDrawable) drawable;
+			gifDrawable = (GifDrawable) drawable;
 			gifDrawable.reset();
 		}
+		else
+		{
+			gifDrawable = null;
+		}
+
+		return gifDrawable;
 	}
 
 	public static interface ImageZoomListener
@@ -70,7 +76,6 @@ public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMat
 		addView( m_imageView );
 
 		m_imageView.setOnMatrixChangeListener( this );
-		m_imageView.setOnPhotoTapListener( this );
 
 		m_progressBar = new ProgressBar( context, null, android.R.attr.progressBarStyleHorizontal );
 		m_progressBar.setIndeterminate( false );
